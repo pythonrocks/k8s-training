@@ -1,0 +1,40 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: my-api
+  namespace: dev
+spec:
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        app: my-api
+    spec:
+      containers:
+        - name: my-api
+          image: eu.gcr.io/long-ratio-272315/my-api:0.1
+          imagePullPolicy: Always
+          ports:
+            - containerPort: 80
+          readinessProbe:
+            tcpSocket:
+              port: 80
+            initialDelaySeconds: 5
+            periodSeconds: 10
+            failureThreshold: 5
+          livenessProbe:
+            tcpSocket:
+              port: 80
+            initialDelaySeconds: 15
+            periodSeconds: 20
+            failureThreshold: 3
+        - name: http-echo
+          image: hashicorp/http-echo
+          args:
+            - "-text=hello world"
+            - "-listen=:8080"
+          ports:
+            - containerPort: 8080
+  selector:
+    matchLabels:
+      app: my-api

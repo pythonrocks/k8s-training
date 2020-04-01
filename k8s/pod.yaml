@@ -1,0 +1,10 @@
+apiVersion: v1
+kind: Pod
+metadata:
+  name: my-api
+spec:
+  containers:
+    - name: my-api
+      image: eu.gcr.io/long-ratio-272315/my-api:0.1
+      ports:
+        - containerPort: 80
