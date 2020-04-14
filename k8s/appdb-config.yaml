@@ -1,0 +1,9 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: appdb-config
+  labels:
+    app: appdb
+data:
+  POSTGRES_DB: appdb
+  POSTGRES_USER: appdb-user

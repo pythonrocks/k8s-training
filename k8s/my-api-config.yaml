@@ -1,0 +1,11 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: my-api-config
+  labels:
+    app: my-api
+data:
+  DB_NAME: appdb
+  DB_USER: appdb-user
+  DB_HOST: appdb-service
+  DB_PORT: "5432"

@@ -12,8 +12,17 @@ spec:
     spec:
       containers:
         - name: my-api
-          image: eu.gcr.io/long-ratio-272315/my-api:0.1
+          image: eu.gcr.io/long-ratio-272315/my-api:0.2
           imagePullPolicy: Always
+          env:
+            - name: DB_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: appdb-password
+                  key: password
+          envFrom:
+            - configMapRef:
+                name: my-api-config
           ports:
             - containerPort: 80
           readinessProbe:
@@ -28,13 +37,65 @@ spec:
             initialDelaySeconds: 15
             periodSeconds: 20
             failureThreshold: 3
-        - name: http-echo
-          image: hashicorp/http-echo
-          args:
-            - "-text=hello world"
-            - "-listen=:8080"
-          ports:
-            - containerPort: 8080
   selector:
     matchLabels:
       app: my-api
+---
+# apiVersion: apps/v1
+# kind: Deployment
+# metadata:
+#   name: appdb
+# spec:
+#   replicas: 1
+#   template:
+#     metadata:
+#       labels:
+#         app: appdb
+#     spec:
+#       containers:
+#         - name: postgres
+#           image: postgres:10.4
+#           imagePullPolicy: "IfNotPresent"
+#           ports:
+#             - containerPort: 5432
+#           env:
+#             - name: POSTGRES_PASSWORD
+#               valueFrom:
+#                 secretKeyRef:
+#                   name: appdb-password
+#                   key: password
+#             - name: PGDATA
+#               value: /var/lib/postgresql/data/pgdata
+#           envFrom:
+#             - configMapRef:
+#                 name: appdb-config
+#           volumeMounts:
+#             - mountPath: /var/lib/postgresql/data
+#               name: postgredb
+#           livenessProbe:
+#             exec:
+#               command:
+#               - pg_isready
+#               - -h
+#               - localhost
+#               - -U
+#               - postgres
+#             initialDelaySeconds: 30
+#             timeoutSeconds: 5
+#           readinessProbe:
+#             exec:
+#               command:
+#               - pg_isready
+#               - -h
+#               - localhost
+#               - -U
+#               - postgres
+#             initialDelaySeconds: 5
+#             timeoutSeconds: 1
+#       volumes:
+#         - name: postgredb
+#           persistentVolumeClaim:
+#             claimName: appdb-pv-claim
+#   selector:
+#     matchLabels:
+#       app: appdb
