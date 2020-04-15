@@ -5,8 +5,8 @@ metadata:
   labels:
     app: appdb-service
 spec:
-  type: NodePort
   ports:
    - port: 5432
+     protocol: TCP
   selector:
    app: appdb
