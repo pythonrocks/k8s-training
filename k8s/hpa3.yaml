@@ -1,0 +1,40 @@
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: hpa3
+  namespace: hpa3
+spec:
+  serviceName: hpa3
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        app: hpa3
+    spec:
+      containers:
+        - name: hpa3
+          image: busybox
+          command: ["/bin/sh"]
+          args: ["-c", "dd if=/dev/zero of=/dev/null | dd if=/dev/zero of=/dev/null | dd if=/dev/zero of=/dev/null | dd if=/dev/zero of=/dev/null"]
+          imagePullPolicy: IfNotPresent
+          resources:
+            requests:
+              cpu: "250m"
+      restartPolicy: Always
+  selector:
+    matchLabels:
+      app: hpa3
+---
+apiVersion: autoscaling/v1
+kind: HorizontalPodAutoscaler
+metadata:
+  name: hpa3
+  namespace: hpa3
+spec:
+  scaleTargetRef:
+    apiVersion: apps/v1
+    kind: StatefulSet
+    name: hpa3
+  minReplicas: 1
+  maxReplicas: 3
+  targetCPUUtilizationPercentage: 50
